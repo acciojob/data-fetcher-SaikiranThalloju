@@ -1,43 +1,39 @@
-import 'regenerator-runtime/runtime';
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import "./../styles/App.css";
+import axios from "axios";
 
 const App = () => {
   const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("loading...");
 
+  function fetchData() {
+    setLoading(true);
+
+    axios
+      .get("https://dummyjson.com/products")
+      .then((response) => {
+        setData(JSON.stringify(response.data, null, 2));
+        setLoading(false);
+        setMsg("loading...");
+      })
+      .catch((err) => {
+        console.log(err);
+        setMsg("An error occurred: ");
+      });
+  }
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("https://dummyjson.com/products");
-        // if (!response.ok) {
-        //   throw new Error("Failed to fetch data");
-        // }
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
-  }, [])
-
+  }, []);
   return (
     <div>
-    
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>Error: {error}</p>
+      {loading ? (
+        <p>{msg}</p>
       ) : (
-        
-        <pre>
-          <h2>Data from API:</h2>
-          {JSON.stringify(data, null, 2)}
-          </pre>
+        <div>
+          <h1>Data Fetched from API</h1>
+          <pre>{data}</pre>
+        </div>
       )}
     </div>
   );
